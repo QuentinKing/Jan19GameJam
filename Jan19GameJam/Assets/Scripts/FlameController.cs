@@ -35,7 +35,7 @@ public class FlameController : MonoBehaviour
             targetLightValue = targetLightValue + lightDropInterval;
         }
 
-        if (pointLight.intensity <= 0.0f)
+        if (targetLightValue <= 0.0f)
         {
             // game over or whatever lol
             Debug.LogError("youre dead");
