@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LightTurnOn : MonoBehaviour
 {
-    public Light controlledLight;
+    public List<Light> controlledLights = new List<Light>();
 
     [SerializeField] private float lightOnIntensity = 1.0f;
     [SerializeField] private float turnOnSpeed = 1.0f;
@@ -28,7 +28,10 @@ public class LightTurnOn : MonoBehaviour
     {
         if (active)
         {
-            controlledLight.intensity = Mathf.Lerp(controlledLight.intensity, lightOnIntensity, Time.deltaTime * turnOnSpeed);
+            foreach (Light controlledLight in controlledLights)
+            {
+                controlledLight.intensity = Mathf.Lerp(controlledLight.intensity, lightOnIntensity, Time.deltaTime * turnOnSpeed);
+            }
         }
     }
 }

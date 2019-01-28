@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.PostProcessing;
+using UnityEngine.SceneManagement;
 
 public class FlameController : MonoBehaviour
 {
@@ -8,42 +10,50 @@ public class FlameController : MonoBehaviour
     [SerializeField] private float lightDropInterval = 0.5f;
     [SerializeField] private float fadeSpeed = 1.0f;
 
-    private float targetLightValue;
+    private int uses = 2;
 
-    public Light pointLight;
+    private float targetLightValue;
+    private float targetIntensityValue;
+    public float lerpSpeed = 3.0f;
+
+    public PostProcessingProfile p;
+    public Light spot;
 
     private void Start()
     {
-        if (pointLight != null)
-        {
-            pointLight.intensity = startingLightIntensity;
-        }
+        var setting = p.vignette.settings;
+        setting.intensity = 0.2f;
+        p.vignette.settings = setting;
 
-        lightDropInterval = Mathf.Min(startingLightIntensity, lightDropInterval);
-        targetLightValue = startingLightIntensity;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == "BadStuff")
-        {
-            targetLightValue = targetLightValue - lightDropInterval;
-        }
-
-        if (other.tag == "GoodStuff")
-        {
-            targetLightValue = targetLightValue + lightDropInterval;
-        }
-
-        if (targetLightValue <= 0.0f)
-        {
-            // game over or whatever lol
-            Debug.LogError("youre dead");
-        }
+        targetIntensityValue = 0.2f;
+        targetLightValue = 10.0f;
     }
 
     private void Update()
     {
-        pointLight.intensity = Mathf.Lerp(pointLight.intensity, targetLightValue, Time.deltaTime * fadeSpeed);
+        var setting = p.vignette.settings;
+        setting.intensity = Mathf.Lerp(setting.intensity, targetIntensityValue, Time.deltaTime * lerpSpeed);
+        p.vignette.settings = setting;
+
+        spot.intensity = Mathf.Lerp(spot.intensity, targetLightValue, Time.deltaTime * lerpSpeed);
+    }
+
+    public bool HasUses()
+    {
+        return uses > 0;
+    }
+
+    public void GainFlame()
+    {
+        targetIntensityValue -= 0.3f;
+        targetLightValue += 5;
+        uses += 1;
+    }
+
+    public void LoseFlame()
+    {
+        targetIntensityValue += 0.3f;
+        targetLightValue -= 5;
+        uses -= 1;
     }
 }
